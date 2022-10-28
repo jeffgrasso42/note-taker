@@ -1,17 +1,33 @@
 // DEPENDENCIES
 const router = require('express').Router();
 const fs = require('fs');
+const fsPromises = require('fs').promises;
 // psuedodatabase
-const notes = require('../../db/db.json');
 // helper function to generate random ids
 const uuid = require('../../helpers/uuid');
+const FsHandler = require('../../helpers/fs');
+
+// async function getLatestNotes (){
+//   try {
+//     let data = await fsPromises.readFile('./db/db.json')
+//     return JSON.parse(data)
+//   } catch (error) {
+//     console.log(error)
+//   }
+// }
 
 // GET / - notes from db.json
-router.get('/', (req, res) => res.json(notes));
+router.get('/', async (req, res) => {
+  console.log('get route');
+  let notes = await FsHandler.readNotes();
+  console.log(notes);
+  res.json(notes);
+});
 
 // POST / - add notes to db.json
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   // store object for alteration
+  let notes = await FsHandler.readNotes();
   const newNote = req.body;
   // add random id to object
   newNote.id = uuid();
@@ -25,8 +41,9 @@ router.post('/', (req, res) => {
 });
 
 // DELETE / - remove notes from db.json
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   if (req.body && req.params.id) {
+    let notes = await FsHandler.readNotes();
     console.info(`${req.method} request received to delete a note`);
     notes.forEach((note, idx) => {
       if (note.id === req.params.id) {
