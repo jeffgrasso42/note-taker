@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
 
 // DELETE / - remove notes from db.json
 router.delete('/:id', (req, res) => {
-  if (req.body) {
+  if (req.body && req.params.id) {
     console.info(`${req.method} request received to delete a note`);
     notes.forEach((note, idx) => {
       if (note.id === req.params.id) {
